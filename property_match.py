@@ -349,7 +349,8 @@ class PropertySearcher:
                 # Retrieve the vector for the property ID
                 initial_vector_result = self.client.retrieve(
                     collection_name=collection,
-                    ids=[property_id]
+                    ids=[property_id],
+                    with_vectors=True
                 )
 
                 # Ensure we retrieved a valid vector for the property ID
@@ -360,10 +361,10 @@ class PropertySearcher:
                 vector = initial_vector_result[0].vector
 
                 # Perform similarity search using query_points
-                results = self.client.query_points(
+                results = self.client.search(
                     collection_name=collection,
-                    vector=vector,
-                    top=top_k * 2  # Fetch extra results to improve merging quality
+                    query_vector=vector,  # Replace 'vector' with 'query_vector'
+                    limit=top_k * 2  # Replace 'top' with 'limit'
                 )
                 search_results[key] = results
 
@@ -441,14 +442,15 @@ class PropertySearcher:
                 point_ids = [point.id for point in points]
 
                 collection_info = self.client.get_collection(collection_name)
-                logging.debug(f"Collection info: {collection_info}")
+                logging.info(f"Collection info: {collection_info}")
                 # collection_description = self.client.describe_collection(collection_name)
                 # logging.debug(f"Collection description: {collection_description}")
 
                 # Retrieve the full data (including vectors) for each point ID
                 full_points = self.client.retrieve(
                     collection_name=collection_name,
-                    ids=point_ids
+                    ids=point_ids,
+                    with_vectors=True
                 )
 
                 for full_point in full_points:
@@ -509,6 +511,8 @@ def initialize_collections(client: QdrantClient):
 # Example usage
 if __name__ == "__main__":
     # Initialize Qdrant client
+    # client = QdrantClient(url="https://1ae0f535-9ed2-47a3-9955-72bc7a9e8e0f.us-east4-0.gcp.cloud.qdrant.io:6333",
+    #                       api_key="WFjB56G9fZwpga0eVBS_U6joSUqSRm5xHixbjiM0pC1Apj9VODse2Q")
     client = QdrantClient(url="http://localhost:6333")
 
     # Initialize collections
@@ -538,9 +542,31 @@ if __name__ == "__main__":
         "neighborhood": "Downtown",
         "city": "Metropolis"
     }
+    example_property2 = {
+        "id": 2,
+        "location_description": "Downtown waterfront apartment with city views mountain views",
+        "amenities": ["parking", "pool", "gym", "doorman"],
+        "interior_features": ["hardwood floors", "granite countertops"],
+        "appliances": ["refrigerator", "dishwasher", "oven"],
+        "exterior_features": ["balcony", "rooftop terrace"],
+        "lot_features": ["waterfront"],
+        "architectural_style": "modern",
+        "municipality": "Metro City",
+        "county": "Metro County",
+        "price_range": "2000-2500",
+        "photo_urls": [
+            "https://api-trestle.corelogic.com/trestle/Media/REBNY/Property/PHOTO-Jpeg/1090420583/18/MzM2Ny8yMTY3LzIw/MjAvMTAyNjUvMTczMTQ2MDU1NQ/apV_PyPXYs4Fe57EbKtFcpnGSgSLbVHDJzhSC-HNQZU"],
+        # Replace with actual image URLs
+        "bedrooms": 2,
+        "bathrooms": 2,
+        "property_type": "apartment",
+        "neighborhood": "Downtown",
+        "city": "Metropolis"
+    }
 
     # Index example property
     success = indexer.index_property(example_property)
+    success = indexer.index_property(example_property2)
     # success = True
     if success:
         # Index more properties for a meaningful search
