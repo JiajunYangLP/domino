@@ -208,7 +208,7 @@ class PropertyIndexer:
                     collection_name=collection,
                     points=[{
                         "id": property_data["id"],
-                        "vector": [0.1, 0.2, 0.3, 0.4, 0.5],
+                        "vector": vector.tolist(),
                         "payload": property_data
                     }]
                 )
@@ -481,9 +481,9 @@ def initialize_collections(client: QdrantClient):
         client (QdrantClient): The Qdrant client instance.
     """
     collections = {
-        "location_vectors": 5,
-        "features_vectors":5,
-        "visual_vectors": 5
+        "location_vectors": 384,
+        "features_vectors":384,
+        "visual_vectors": 512
     }
 
     for collection in collections.keys():
