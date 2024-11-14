@@ -8,17 +8,39 @@ from property_searcher import PropertySearcher
 
 # Function to fetch all property IDs from a collection in Qdrant
 def get_all_property_ids_from_collection(client, collection_name):
-    # Use `scroll` method to iterate over all points in the collection
+    # Initialize the list for property IDs
     property_ids = []
-    scroll_result = client.scroll(collection_name=collection_name, limit=100)
-    property_ids.extend([record.id for record in scroll_result.records])
+    next_page_offset = None
 
-    # Continue scrolling until there are no more points
-    while scroll_result.next_page_offset is not None:
-        scroll_result = client.scroll(collection_name=collection_name, offset=scroll_result.next_page_offset, limit=100)
-        property_ids.extend([record.id for record in scroll_result.records])
+    # Use `scroll` method to iterate over all points in the collection
+    while True:
+        # Unpack the returned tuple into records and next_page_offset
+        records, next_page_offset = client.scroll(collection_name=collection_name, offset=next_page_offset, limit=100)
 
-    return property_ids  # Ensure this returns a list
+        # Extract IDs from records and add them to the list
+        property_ids.extend([record.id for record in records])
+
+        # Break if there are no more pages
+        if next_page_offset is None:
+            break
+
+    print(property_ids)
+
+    return property_ids
+
+# Function to fetch all property IDs from a collection in Qdrant
+# def get_all_property_ids_from_collection(client, collection_name):
+#     # Use `scroll` method to iterate over all points in the collection
+#     property_ids = []
+#     scroll_result = client.scroll(collection_name=collection_name, limit=100)
+#     print(scroll_result)
+#     property_ids.extend([record.id for record in scroll_result.records])
+#     # Continue scrolling until there are no more points
+#     while scroll_result.next_page_offset is not None:
+#         scroll_result = client.scroll(collection_name=collection_name, offset=scroll_result.next_page_offset, limit=100)
+#         property_ids.extend([record.id for record in scroll_result.records])
+#
+#     return property_ids  # Ensure this returns a list
 
 
 # Function to search similar properties for all properties in Qdrant or from provided property ID list, and save to CSV
@@ -87,5 +109,5 @@ if __name__ == "__main__":
     property_id_list = None  # Set to None to fetch from Qdrant
 
     # Run the similarity search for all properties in Qdrant or from provided list, saving results to CSV
-    search_and_save_similar_properties(client, searcher, filters=filters, property_id_list=property_id_list,
+    search_and_save_similar_properties(client, searcher, filters=None, property_id_list=property_id_list,
                                        mode=SearchMode.BALANCED, top_k=5, output_csv="similar_properties.csv")
