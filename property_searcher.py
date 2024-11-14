@@ -58,11 +58,14 @@ class PropertySearcher:
         for prop in properties:
             try:
                 # Price filtering
-                if 'price_range' in prop:
+                if 'price_range' in prop and prop.get('price_range'):
                     price_min, price_max = map(float, prop['price_range'].split('-'))
                     if filters.min_price is not None and price_max < filters.min_price:
                         continue
                     if filters.max_price is not None and price_min > filters.max_price:
+                        continue
+                elif 'list_price' in prop and prop.get('list_price'):
+                    if filters.min_price > prop.get('list_price') or filters.max_price < prop.get('list_price'):
                         continue
                 else:
                     continue  # Exclude properties without price information
