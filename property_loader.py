@@ -106,13 +106,13 @@ class PropertyLoader:
 
 def query_property_records_from_datalake() -> list:
     pd.set_option('display.max_columns', None)
-    boto3.setup_default_session(profile_name='default')
+    boto3.setup_default_session(profile_name='data-staging')
     options = {
         'start_date': '2024-11-01T00:00:00',
         'end_date': '2024-11-15T00:00:00',
         'timestamp_column_name': 'lp_processed_timestamp',
-        's3_bucket': 'lp-datalakehouse-production/warehouse',
-        'source_athena_database': 'lp_data_model_production',
+        's3_bucket': 'lp-datalakehouse-stage/warehouse',
+        'source_athena_database': 'lp_data_model_stage',
         'source_data_table': 'property',
         'limit': 1000,
     }
