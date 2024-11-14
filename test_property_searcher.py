@@ -13,16 +13,16 @@ searcher = PropertySearcher(client)
 
 # Define search filters
 filters = PropertyFilters(
-    min_price=10000.0,
+    min_price=1000.0,
     max_price=2500000.0,
     min_bedrooms=2,
-    max_bedrooms=4,
-    # must_have_amenities=["parking"]
+    max_bedrooms=5,
+    must_have_amenities=["parking"]
 )
 
 # Find similar properties
 similar_properties = searcher.search_similar_properties(
-    property_id=7527604, # 7510668,7527604,33422879720
+    property_id=33422879720, # 7510668,7527604,33422879720
     mode=SearchMode.BALANCED,
     filters=filters,
     top_k=5
